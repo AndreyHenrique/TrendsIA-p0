@@ -27,8 +27,8 @@ def chamar_llm(message: str):
         timeout=60
     )
     
-    print(resultado.json()["candidates"][0]["content"]["parts"][0]["text"])
+    return resultado.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 
 if __name__ == "__main__":
-    chamar_llm("2+2")
+    print(chamar_llm("2+2"))
