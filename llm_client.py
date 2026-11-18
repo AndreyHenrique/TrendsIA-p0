@@ -28,7 +28,12 @@ def chamar_llm(message: str, system_instructin: str = ""):
         timeout=60
     )
     
-    return resultado.json()["candidates"][0]["content"]["parts"][0]["text"]
+    candidato = resultado.json()["candidates"][0]
+
+    return "".join(
+        p["text"] for p in candidato["content"]["parts"]
+    )
+    #["content"]["parts"][0]["text"]
 
 
 if __name__ == "__main__":
