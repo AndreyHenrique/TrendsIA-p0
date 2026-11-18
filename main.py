@@ -1,6 +1,6 @@
 import questionary 
 from llm_client import chamar_llm
-from dados import save_perfil, get_perfil
+from dados import save_perfil, get_perfil, get_tarefas, save_tarefas
 
 def main():
     
@@ -81,14 +81,54 @@ def menu_perfil():
         case _:
             pass 
 
+def atualizar_tarefas(conteudo):
+    save_tarefas(conteudo)
+    questionary.print(
+        text="Suas tarefas foram salvas com sucesso."
+    )
 
 def menu_tarefas():
-    # Mostra um resumo das suas tarefas
+    tarefas = get_tarefas()
     
-    # Menu com: 
-    # Opção 1: Pedir para editar
-    # Opção 2: Voltar
-    pass 
+    # Mostra um resumo do seu perfil
+    questionary.print(
+        text=tarefas if tarefas else "Você ainda não preencheu suas tarefas."
+    )
+
+    # Menu com:
+    opcao = sub_menu("Tarefas", ["Editar" if tarefas else "Criar"])
+    match opcao:
+        # Opção 1: Pedir para editar ou criar   
+        case "Editar":
+            tarefas_input = questionary.text(
+                message="Digite o que você gostaria de modificar:"
+            ).ask()
+ 
+            resposta = chamar_llm(
+                message=tarefas_input,
+                system_instructin=(
+                    "Você é uma IA que analisa textos e retorna apenas um resumo sobre as tarefas do usuário "
+                    "Você deve editar o seguinte texto para englobar as novas alterações do usuário. "
+                    f"Resumo anterior: {tarefas}")
+            )
+            atualizar_tarefas(resposta)
+            
+        case "Criar":
+            tarefas_input = questionary.text(
+                message="Descreva suas tarefas pendentes:"
+            ).ask()
+ 
+            resposta = chamar_llm(
+                message=tarefas_input,
+                system_instructin=(
+                    "Você é uma IA que analisa textos e retorna apenas um resumo sobre as tarefas do usuário")
+            )
+            
+            atualizar_tarefas(resposta)
+            
+        # Opção 2: Voltar
+        case _:
+            pass 
 
 def menu_plano():
     # Mostra um resumo do plano atual
