@@ -2,7 +2,7 @@ import os
 import httpx 
 from dotenv import load_dotenv
 
-def chamar_llm(message: str):
+def chamar_llm(message: str, system_instructin: str = ""):
     
     load_dotenv()
     base_url = os.getenv("GEMINI_URL")
@@ -14,6 +14,7 @@ def chamar_llm(message: str):
             'X-goog-api-key' : api_key
         },
         json={
+            "system_instruction" : {"parts": [{"text": system_instructin}]},
             "contents" : [
                 {
                     "parts" : [
