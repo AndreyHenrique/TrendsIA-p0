@@ -1,6 +1,6 @@
 import questionary 
 from llm_client import chamar_llm
-from dados import save_perfil, get_perfil, get_tarefas, save_tarefas
+from dados import save_perfil, get_perfil, get_tarefas, save_tarefas, get_plano, save_plano
 
 def main():
     
@@ -45,6 +45,8 @@ def menu_perfil():
             perfil_input = questionary.text(
                 message="Digite o que você gostaria de modificar:"
             ).ask()
+ 
+            if not perfil_input: return
  
             resposta = chamar_llm(
                 message=perfil_input,
@@ -104,6 +106,8 @@ def menu_tarefas():
                 message="Digite o que você gostaria de modificar:"
             ).ask()
  
+            if not tarefas_input: return
+    
             resposta = chamar_llm(
                 message=tarefas_input,
                 system_instructin=(
@@ -130,13 +134,80 @@ def menu_tarefas():
         case _:
             pass 
 
+def atualizar_plano(conteudo):
+    save_plano(conteudo)
+    questionary.print(
+        text="Seu plano foi salvo com sucesso"
+    )
+
 def menu_plano():
-    # Mostra um resumo do plano atual
+    plano = get_plano()
+    perfil = get_perfil()
+    tarefas = get_tarefas()
     
-    # Menu com: 
-    # Opção 1: Pedir para editar 
-    # Opção 2: Voltar
-    pass 
+    # Mostra o plano, caso exista
+    questionary.print(
+        text=plano if plano else "Você ainda não possui um plano"
+    )
+
+    if not perfil or not tarefas:
+        questionary.print(
+            text="Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano."
+        )
+        pass 
+
+    # Menu com:
+    opcao = sub_menu("Plano", ["Editar" if plano else "Criar"])
+    match opcao:
+        # Opção 1: Pedir para editar ou criar   
+        
+        case "Editar":
+            plano_input = questionary.text(
+                message="Digite o que você gostaria de modificar:"
+            ).ask()
+ 
+            if not plano_input: return
+ 
+            resposta = chamar_llm(
+                message= plano_input + (
+                        f"Meu perfil e meus gostos: {perfil}. "
+                        f"Atividades que eu preciso fazer: {tarefas}."
+                    ),
+                system_instructin=(
+                    "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
+                    "Você vai atuar como o Jarvis do Homem de Ferro. "
+                    "Você deve conciliar o perfil do usuário com o que ele precisa fazer."
+                    "Você deve responder o usuário com toda a rotina dele durante o dia "
+                    
+                    "O usuário pediu que você modificasse o plano que você fez anteriormente"
+                    
+                    f"Plano anterior: {plano}. Justificativa do usuário: {plano_input}"
+                    
+                    f"Perfil e gostos do usuário: {perfil}. "
+                    f"Atividades que o usuário precisa fazer: {tarefas}. "
+                )
+            )
+            atualizar_plano(resposta)
+            
+        case "Criar":
+            resposta = chamar_llm(
+                message=(
+                    f"Meu perfil e meus gostos: {perfil}. "
+                    f"Atividades que eu preciso fazer: {tarefas}."
+                ),
+                system_instructin=(
+                    "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
+                    "Você vai atuar como o Jarvis do Homem de Ferro. "
+                    "Você deve conciliar o perfil do usuário com o que ele precisa fazer."
+                    "Você deve responder o usuário com toda a rotina dele durante o dia "
+                )
+            )
+            
+            atualizar_plano(resposta)
+            
+        # Opção 2: Voltar
+        case _:
+            pass 
 
 if __name__ == "__main__":
     main()

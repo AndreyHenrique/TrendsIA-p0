@@ -6,6 +6,9 @@ def get_perfil():
 def get_tarefas():
     return ler("data/tarefas.txt")
 
+def get_plano():
+    return ler("data/plano.txt")
+
 
 def ler(file_name: str):
     caminho = Path(file_name)
@@ -20,6 +23,9 @@ def save_perfil(perfil_text):
     
 def save_tarefas(tarefas_text):
     escrever(file_name="data/tarefas.txt", content=tarefas_text)
+    
+def save_plano(plano_text):
+    escrever(file_name="data/plano.txt", content=plano_text)
     
 def escrever(file_name: str, content):
     
