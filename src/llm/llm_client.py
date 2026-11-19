@@ -33,7 +33,6 @@ def chamar_llm(message: str, system_instructin: str = ""):
     return "".join(
         p["text"] for p in candidato["content"]["parts"]
     )
-    #["content"]["parts"][0]["text"]
 
 
 if __name__ == "__main__":
