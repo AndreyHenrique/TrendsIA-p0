@@ -66,6 +66,8 @@ def menu_perfil():
             perfil_input = questionary.text(
                 message="Descreva seus hábitos diários e preferências pessoais:"
             ).ask()
+            
+            if not perfil_input: return
  
             resposta = chamar_llm(
                 message=perfil_input,
@@ -121,6 +123,8 @@ def menu_tarefas():
             tarefas_input = questionary.text(
                 message="Descreva suas tarefas pendentes:"
             ).ask()
+            
+            if not tarefas_input: return
  
             resposta = chamar_llm(
                 message=tarefas_input,
@@ -154,7 +158,7 @@ def menu_plano():
         questionary.print(
             text="Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano."
         )
-        pass 
+        return  
 
     # Menu com:
     opcao = sub_menu("Plano", ["Editar" if plano else "Criar"])
