@@ -1,14 +1,18 @@
+import questionary
+from src.repositories.arquivo_repository import carregar, salvar
+from src.services.utils_service import sub_menu
+from src.llm.llm_client import chamar_llm
 
 def atualizar_plano(conteudo):
-    save_plano(conteudo)
+    salvar("plano", conteudo)
     questionary.print(
         text="Seu plano foi salvo com sucesso"
     )
 
 def menu_plano():
-    plano = get_plano()
-    perfil = get_perfil()
-    tarefas = get_tarefas()
+    plano = carregar("plano")
+    perfil = carregar("perfil")
+    tarefas = carregar("tarefas")
     
     # Mostra o plano, caso exista
     questionary.print(

@@ -1,11 +1,16 @@
+import questionary
+from src.repositories.arquivo_repository import carregar, salvar
+from src.llm.llm_client import chamar_llm
+from src.services.utils_service import sub_menu
+
 def atualizar_tarefas(conteudo):
-    save_tarefas(conteudo)
+    salvar("tarefas", conteudo)
     questionary.print(
         text="Suas tarefas foram salvas com sucesso."
     )
 
 def menu_tarefas():
-    tarefas = get_tarefas()
+    tarefas = carregar("tarefas")
     
     # Mostra um resumo do seu perfil
     questionary.print(

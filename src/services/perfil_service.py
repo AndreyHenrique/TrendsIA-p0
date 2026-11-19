@@ -1,8 +1,10 @@
 import questionary
 from src.llm.llm_client import chamar_llm
+from src.repositories.arquivo_repository import carregar, salvar
+from src.services.utils_service import sub_menu
 
 def menu_perfil():
-    perfil = get_perfil()
+    perfil = carregar("perfil")
     
     # Mostra um resumo do seu perfil
     questionary.print(
@@ -29,7 +31,7 @@ def menu_perfil():
                     f"Resumo anterior: {perfil}")
             )
             
-            save_perfil(resposta)
+            salvar("perfil", resposta)
             questionary.print(
                 text="Seus hábitos/preferências foram salvos com sucesso."
             )
@@ -48,7 +50,7 @@ def menu_perfil():
                     "de coisas que aquela pessoa não abre mão na rotina.")
             )
             
-            save_perfil(resposta)
+            salvar("perfil", resposta)
             questionary.print(
                 text="Seus hábitos/preferências foram salvos com sucesso."
             )

@@ -1,5 +1,7 @@
 import questionary 
-from src.services.service import menu_perfil, menu_plano, menu_tarefas
+from src.services.perfil_service import menu_perfil
+from src.services.tarefas_service import menu_tarefas
+from src.services.plano_service import menu_plano
 
 def main():
     
