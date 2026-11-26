@@ -6,7 +6,7 @@ DATA_DIR = BASE_DIR / "data"
 
 ARQUIVOS ={
     "perfil" : "perfil.txt",
-    "tarefas" : "tarefas.txt",
+    "tarefa" : "tarefas.txt",
     "plano" : "plano.txt"
 }
 

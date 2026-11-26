@@ -1,79 +1,64 @@
-import questionary
-from src.repositories.arquivo_repository import carregar, salvar
-from src.services.utils_service import sub_menu
-from src.llm.llm_client import chamar_llm
+from typing import override
 
-def atualizar_plano(conteudo):
-    salvar("plano", conteudo)
-    questionary.print(
-        text="Seu plano foi salvo com sucesso"
-    )
+from src.services.base_service import SecaoService
+from src.services.perfil_service import PerfilService
+from src.services.tarefas_service import TarefaService
 
-def menu_plano():
-    plano = carregar("plano")
-    perfil = carregar("perfil")
-    tarefas = carregar("tarefas")
+class PlanoService(SecaoService):
+    nome = "plano"
+    titulo = "Plano"
+    empty_msg = "Você ainda não possui um plano"
+    use_create_msg = False
     
-    # Mostra o plano, caso exista
-    questionary.print(
-        text=plano if plano else "Você ainda não possui um plano"
-    )
-
-    if not perfil or not tarefas:
-        questionary.print(
-            text="Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano."
-        )
-        return  
-
-    # Menu com:
-    opcao = sub_menu("Plano", ["Editar" if plano else "Criar"])
-    match opcao:
-        # Opção 1: Pedir para editar ou criar   
+    def __init__(self, perfil: PerfilService, tarefa: TarefaService):
+        self.perfil = perfil
+        self.tarefa = tarefa
+    
+    @property
+    def get_pedido_padrao(self):
+        perfil = self.perfil.obter()
+        tarefas = self.tarefa.obter()
         
-        case "Editar":
-            plano_input = questionary.text(
-                message="Digite o que você gostaria de modificar:"
-            ).ask()
- 
-            if not plano_input: return
- 
-            resposta = chamar_llm(
-                message= plano_input + (
-                        f"Meu perfil e meus gostos: {perfil}. "
-                        f"Atividades que eu preciso fazer: {tarefas}."
-                    ),
-                system_instructin=(
-                    "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
-                    "Você vai atuar como o Jarvis do Homem de Ferro. "
-                    "Você deve conciliar o perfil do usuário com o que ele precisa fazer."
-                    "Você deve responder o usuário com toda a rotina dele durante o dia "
-                    
-                    "O usuário pediu que você modificasse o plano que você fez anteriormente"
-                    
-                    f"Plano anterior: {plano}. Justificativa do usuário: {plano_input}"
-                    
-                    f"Perfil e gostos do usuário: {perfil}. "
-                    f"Atividades que o usuário precisa fazer: {tarefas}. "
-                )
+        if not perfil or not tarefas:
+            pass
+            #raise DadosIncompletosErros("Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano.")
+        
+        pedido: str = (
+                f"Perfil e gostos do usuário: {perfil}. "
+                f"Atividades que o usuário precisa fazer: {tarefas}." 
             )
-            atualizar_plano(resposta)
-            
-        case "Criar":
-            resposta = chamar_llm(
-                message=(
-                    f"Meu perfil e meus gostos: {perfil}. "
-                    f"Atividades que eu preciso fazer: {tarefas}."
-                ),
-                system_instructin=(
-                    "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
-                    "Você vai atuar como o Jarvis do Homem de Ferro. "
-                    "Você deve conciliar o perfil do usuário com o que ele precisa fazer."
-                    "Você deve responder o usuário com toda a rotina dele durante o dia "
-                )
+        return pedido
+    
+    @override
+    def criar(self, entrada: str = "") -> str:
+        return super().criar(self.get_pedido_padrao)
+    
+    @property
+    @override
+    def prompt_criar(self):
+        return (
+                "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
+                "Não adicione saudações, apenas retorne o resumo do plano para o usuário. "
+                "Você deve conciliar o perfil do usuário com o que ele precisa fazer. "
+                "Você deve responder o usuário com toda a rotina dele durante o dia "
             )
-            
-            atualizar_plano(resposta)
-            
-        # Opção 2: Voltar
-        case _:
-            pass 
+        
+    @override
+    def editar(self, pedido):
+        pedido = (
+                "O usuário pediu que você modificasse o plano que você fez anteriormente. "
+                f"{self.get_pedido_padrao}"
+                f"Plano anterior: {self.obter()}. Justificativa do usuário: {pedido}"
+                )
+        
+        return super().editar(pedido)
+    
+    @property
+    @override
+    def prompt_editar(self):
+        return (
+                "Você é uma IA especialista em unir gostos pessoais do usuário com as atividades que ele tem para fazer. "
+                "Não adicione saudações, apenas retorne o resumo do plano para o usuário. "
+                "Você deve conciliar o perfil do usuário com o que ele precisa fazer. "
+                "Você deve responder o usuário com toda a rotina dele durante o dia "
+            )
