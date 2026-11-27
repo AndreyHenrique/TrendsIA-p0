@@ -22,5 +22,8 @@ class ServicoIndisponivelError(LlmError):
 class FalhaComunicacaoError(LlmError):
     pass
 
+class TimeoutLlmError(LlmError):
+    pass
+
 class RespostaInesperadaError(LlmError):
     pass 

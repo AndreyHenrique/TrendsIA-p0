@@ -10,4 +10,5 @@ from src.exceptions.llm_client_exceptions import (
     ServicoIndisponivelError,
     FalhaComunicacaoError,
     RespostaInesperadaError,
+    TimeoutLlmError
 )

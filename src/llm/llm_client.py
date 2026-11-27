@@ -1,7 +1,7 @@
 import httpx 
 
 from src.exceptions import (
-    UrlInvalidaError, CredencialInvalidaError,
+    UrlInvalidaError, CredencialInvalidaError, TimeoutLlmError,
     ServicoIndisponivelError, FalhaComunicacaoError, RespostaInesperadaError
     )
 from src.config import carregar_config
@@ -30,7 +30,7 @@ def _enviar(base_url, api_key, message, system_instruction):
     except (httpx.UnsupportedProtocol, httpx.InvalidURL) as e:
         raise UrlInvalidaError("GEMINI_URL inválida. Verifique-a no arquivo .env.") from e
     except httpx.TimeoutException as e: 
-        raise FalhaComunicacaoError("O modelo demorou demais para responder. Tente novamente.") from e
+        raise TimeoutLlmError("O modelo demorou demais para responder. Tente novamente.") from e
     except httpx.RequestError as e:
         raise FalhaComunicacaoError("Não foi possível conectar ao serviço. Verifique sua internet.") from e
     
