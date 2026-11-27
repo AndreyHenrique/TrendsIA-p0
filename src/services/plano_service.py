@@ -3,6 +3,7 @@ from typing import override
 from src.services.base_service import SecaoService
 from src.services.perfil_service import PerfilService
 from src.services.tarefas_service import TarefaService
+from src.exceptions import DadosIncompletosError
 
 class PlanoService(SecaoService):
     nome = "plano"
@@ -20,8 +21,7 @@ class PlanoService(SecaoService):
         tarefas = self.tarefa.obter()
         
         if not perfil or not tarefas:
-            pass
-            #raise DadosIncompletosErros("Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano.")
+            raise DadosIncompletosError("Por favor, preencha seu perfil e suas tarefas antes de tentar criar um plano.")
         
         pedido: str = (
                 f"Perfil e gostos do usuário: {perfil}. "
