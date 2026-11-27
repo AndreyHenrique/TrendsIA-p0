@@ -24,7 +24,7 @@ Os dados ficam em arquivos de texto locais na pasta `data/` (ignorada pelo Git, 
 
 ## Requisitos
 
-- Python **3.10 ou superior** (o código usa `match/case`)
+- Python **3.12+ ou superior** (o código usa `match/case`)
 - Uma chave da API do Gemini (gratuita no [Google AI Studio](https://aistudio.google.com/))
 
 ## Instalação

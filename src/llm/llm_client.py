@@ -48,27 +48,18 @@ def _enviar(base_url, api_key, message, system_instruction):
     except httpx.RequestError as e:
         raise FalhaComunicacaoError("Não foi possível conectar ao serviço. Verifique sua internet.") from e
     
-    # Valida json da respsota 
-    try:
-        res_json = resultado.json()
-    except ValueError as e:
-        raise RespostaInesperadaError("O serviço retornou uma resposta ilegível.") from e  
-    
-    return res_json
+    return resultado
 
-def _verificar_status(resp: dict) -> None:
-    error = resp.get("error")
-    if not error:
-        return 
+def _verificar_status(resp: httpx.Response) -> None:
+    status = resp.status_code
+    if resp.is_success: return 
     
-    mensagem = error.get("message", "")
+    try:
+        mensagem_error = resp.json().get("error", {}).get("message", "")
+    except ValueError:
+        mensagem_error =  "" 
     
-    
-    status = error.get("code")
-    
-    if not isinstance(status, int):
-        raise RespostaInesperadaError("O serviço retornou um erro em formato inesperado.")
-    if status in (401, 403) or (status == 400 and "API key" in mensagem):
+    if status in (401, 403) or (status == 400 and "API key" in mensagem_error):
         raise CredencialInvalidaError("Chave de API inválida. Verifique a GEMINI_API_KEY no .env.")
     if status == 404:
         raise UrlInvalidaError("Modelo não encontrado. Confira o nome do modelo na GEMINI_URL.")
@@ -79,10 +70,17 @@ def _verificar_status(resp: dict) -> None:
 
     raise RespostaInesperadaError(f"O serviço recusou a requisição ({status}).")
 
-def _prepara_resposta_usuario(res_json):
+def _prepara_resposta_usuario(resp: httpx.Response):
+    
+    # Valida json da respsota 
+    try:
+        dados = resp.json()
+    except ValueError as e:
+        raise RespostaInesperadaError("O serviço retornou uma resposta ilegível.") from e  
+    
     # Válida formato da resposta
     try:
-        candidato = res_json["candidates"][0]
+        candidato = dados["candidates"][0]
         resposta = "".join(
             p["text"] for p in candidato["content"]["parts"]
         )
