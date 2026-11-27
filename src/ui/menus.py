@@ -72,6 +72,10 @@ def menu_secao(servico: SecaoService):
                 servico.criar(user_input)
                 
                 questionary.print(
+                    text=servico.obter()
+                )
+                
+                questionary.print(
                     text="Salvo com sucesso.", style="fg:green"
                 )
             case "Editar":
@@ -80,6 +84,10 @@ def menu_secao(servico: SecaoService):
                 
                 # Edita as informações da seção
                 servico.editar(user_input)
+                
+                questionary.print(
+                    text=servico.obter()
+                )
                 
                 questionary.print(
                     text="Atualizado com sucesso.", style="fg:green"

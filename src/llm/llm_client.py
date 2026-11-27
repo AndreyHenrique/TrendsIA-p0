@@ -1,24 +1,10 @@
-import os
 import httpx 
-from dotenv import load_dotenv
 
 from src.exceptions import (
-    UrlAusenteError, UrlInvalidaError, CredencialAusenteError, CredencialInvalidaError,
+    UrlInvalidaError, CredencialInvalidaError,
     ServicoIndisponivelError, FalhaComunicacaoError, RespostaInesperadaError
     )
-
-def _carregar_config():
-    load_dotenv()
-
-    base_url = os.getenv("GEMINI_URL")
-    if not base_url:
-        raise UrlAusenteError("GEMINI_URL não definida. Configure-a no arquivo .env.")
-    
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key: 
-        raise CredencialAusenteError("GEMINI_API_KEY não definida. Configure-a no arquivo .env.")
-    
-    return base_url, api_key
+from src.config import carregar_config
 
 def _enviar(base_url, api_key, message, system_instruction):
     try:
@@ -94,7 +80,7 @@ def _prepara_resposta_usuario(resp: httpx.Response):
 
 def chamar_llm(message: str, system_instruction: str = ""):
     
-    url, chave = _carregar_config()
+    url, chave = carregar_config()
     
     resp = _enviar(url, chave, message, system_instruction)  
         
