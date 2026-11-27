@@ -100,4 +100,4 @@ def menu_secao(servico: SecaoService):
     except AppError as e:
         questionary.print(str(e), style="fg:red")
     except KeyboardInterrupt:
-        questionary.print("Operação cancelada", style="fg-yellow")
+        questionary.print("Operação cancelada", style="fg:yellow")
